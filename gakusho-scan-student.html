@@ -1,0 +1,393 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+#gs-root{
+  --bg:#F3F4F7; --surface:#FFFFFF; --surface-alt:#EAECF2;
+  --ink:#161A23; --ink-soft:#5B6272; --ink-faint:#9096A6;
+  --primary:#2545C4; --primary-dark:#17318C; --primary-bg:#E7EAFB;
+  --success:#0F8A5F; --success-bg:#E1F5EC;
+  --warning:#B96B12; --warning-bg:#FBEEDC;
+  --danger:#C23B34; --danger-bg:#FBE7E5;
+  --border:#DCDFE6; --scan:#2FD9C4;
+  --radius:10px;
+  --f-display:'Space Grotesk','Zen Kaku Gothic New',sans-serif;
+  --f-body:'Zen Kaku Gothic New',sans-serif;
+  --f-mono:'JetBrains Mono',monospace;
+  font-family:var(--f-body); color:var(--ink); background:var(--bg);
+  width:100%; box-sizing:border-box; padding:0 0 3rem;
+}
+#gs-root *{ box-sizing:border-box; }
+#gs-root button{ font-family:var(--f-body); cursor:pointer; }
+#gs-root input,#gs-root select,#gs-root textarea{ font-family:var(--f-body); }
+.gs-topbar{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem; padding:1.1rem 1.4rem; background:var(--ink); border-radius:var(--radius) var(--radius) 0 0; }
+.gs-brand{ display:flex; align-items:center; gap:.6rem; }
+.gs-brand-mark{ width:34px; height:34px; border-radius:8px; background:linear-gradient(180deg,var(--scan),var(--primary)); display:flex; align-items:center; justify-content:center; font-family:var(--f-mono); font-weight:700; color:#fff; font-size:13px; }
+.gs-brand-text h1{ font-family:var(--f-display); font-size:17px; font-weight:700; color:#fff; margin:0; letter-spacing:.02em; }
+.gs-brand-text p{ font-size:11px; color:#B7BCCB; margin:2px 0 0; font-family:var(--f-mono); }
+.gs-shell{ background:var(--surface); border-radius:0 0 var(--radius) var(--radius); border:1px solid var(--border); border-top:none; padding:1.6rem 1.4rem 2rem; }
+.gs-steps{ display:flex; gap:8px; margin-bottom:1.4rem; flex-wrap:wrap; }
+.gs-step{ font-family:var(--f-mono); font-size:11px; color:var(--ink-faint); background:var(--surface-alt); padding:5px 10px; border-radius:20px; }
+.gs-step.on{ color:var(--primary-dark); background:var(--primary-bg); font-weight:700; }
+.gs-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem 1.3rem; margin-bottom:1rem; }
+.gs-label{ font-size:12px; font-weight:700; color:var(--ink-soft); display:block; margin-bottom:6px; letter-spacing:.02em; }
+.gs-select,.gs-input,.gs-textarea{ width:100%; border:1px solid var(--border); border-radius:8px; padding:9px 11px; font-size:14px; color:var(--ink); background:#fff; }
+.gs-select:focus,.gs-input:focus,.gs-textarea:focus{ outline:2px solid var(--primary); outline-offset:1px; border-color:var(--primary); }
+.gs-btn{ border:none; border-radius:8px; padding:10px 18px; font-size:14px; font-weight:700; }
+.gs-btn-primary{ background:var(--primary); color:#fff; }
+.gs-btn-primary:hover{ background:var(--primary-dark); }
+.gs-btn-primary:disabled{ background:#B9C1E6; cursor:not-allowed; }
+.gs-btn-ghost{ background:var(--surface-alt); color:var(--ink); }
+.gs-btn-ghost:hover{ background:#DEE1EA; }
+.gs-drop{ border:2px dashed var(--border); border-radius:var(--radius); padding:1.6rem; text-align:center; }
+.gs-scanbox{ position:relative; overflow:hidden; border-radius:8px; border:1px solid var(--border); background:#0D1017; max-width:360px; margin:0 auto; }
+.gs-scanbox img{ display:block; width:100%; }
+.gs-scanline{ position:absolute; left:0; right:0; height:3px; background:linear-gradient(90deg,transparent,var(--scan) 25%,var(--scan) 75%,transparent); box-shadow:0 0 12px 2px var(--scan); top:0; opacity:0; }
+.gs-scanline.on{ animation:gs-sweep 1.7s linear infinite; opacity:1; }
+@keyframes gs-sweep{ 0%{ top:0; } 100%{ top:100%; } }
+.gs-term{ font-family:var(--f-mono); font-size:11.5px; line-height:1.55; background:#0D1017; color:#8FE8D8; border-radius:8px; padding:.85rem 1rem; max-height:160px; overflow-y:auto; white-space:pre-wrap; word-break:break-all; }
+.gs-badge{ display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; padding:5px 12px; border-radius:20px; white-space:nowrap; }
+.gs-badge-ok{ background:var(--success-bg); color:var(--success); }
+.gs-badge-ng{ background:var(--danger-bg); color:var(--danger); }
+.gs-badge-review{ background:var(--warning-bg); color:var(--warning); }
+.gs-row{ display:flex; gap:.7rem; flex-wrap:wrap; align-items:center; }
+.gs-progress{ height:6px; background:var(--surface-alt); border-radius:4px; overflow:hidden; margin-top:8px; }
+.gs-progress-bar{ height:100%; background:var(--scan); width:0%; transition:width .2s; }
+.gs-mini{ font-size:12px; color:var(--ink-soft); }
+.gs-note{ font-size:12px; color:var(--ink-faint); line-height:1.6; margin-top:1rem; }
+.gs-check{ display:flex; align-items:flex-start; gap:8px; font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
+.gs-check input{ margin-top:3px; }
+.gs-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
+.gs-status-group{ display:flex; flex-wrap:wrap; gap:8px; }
+.gs-status-opt{ display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink); background:var(--surface-alt); border:1px solid var(--border); border-radius:20px; padding:6px 12px 6px 10px; cursor:pointer; user-select:none; }
+.gs-status-opt input{ accent-color:var(--primary); width:14px; height:14px; margin:0; }
+.gs-status-opt:has(input:checked){ background:var(--primary-bg); border-color:var(--primary); color:var(--primary-dark); font-weight:700; }
+@media (max-width:520px){ .gs-grid2{ grid-template-columns:1fr; } }
+</style>
+
+<div id="gs-root">
+  <div class="gs-topbar">
+    <div class="gs-brand">
+      <div class="gs-brand-mark">ID</div>
+      <div class="gs-brand-text">
+        <h1>学証スキャン</h1>
+        <p>グローパーソン合同会社 学生登録プラットフォーム</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gs-shell">
+    <section id="gs-view-student">
+      <div class="gs-steps">
+        <span class="gs-step on" id="gs-s1">① 基本情報を入力</span>
+        <span class="gs-step" id="gs-s2">② 学生証を撮影・選択</span>
+        <span class="gs-step" id="gs-s3">③ 判定結果を確認</span>
+        <span class="gs-step" id="gs-s4">④ 送信して登録完了</span>
+      </div>
+
+      <div class="gs-card">
+        <label class="gs-label">基本情報</label>
+        <div class="gs-grid2">
+          <div><label class="gs-label" style="font-size:11px;">氏名</label><input class="gs-input" id="gs-f-name" placeholder="山田 太郎"></div>
+          <div><label class="gs-label" style="font-size:11px;">生年月日</label><input class="gs-input" id="gs-f-dob" type="date"></div>
+          <div><label class="gs-label" style="font-size:11px;">卒業年度（西暦）</label><input class="gs-input" id="gs-f-gradyear" type="number" placeholder="2027" min="2000" max="2100"></div>
+          <div style="grid-column:1 / -1;">
+            <label class="gs-label" style="font-size:11px;">ステータス（該当するものすべてを選択）</label>
+            <div class="gs-status-group" id="gs-f-status-group">
+              <label class="gs-status-opt"><input type="checkbox" name="gs-status" value="ストレート学生"><span>ストレート学生</span></label>
+              <label class="gs-status-opt"><input type="checkbox" name="gs-status" value="浪人"><span>浪人</span></label>
+              <label class="gs-status-opt"><input type="checkbox" name="gs-status" value="留年"><span>留年</span></label>
+              <label class="gs-status-opt"><input type="checkbox" name="gs-status" value="留学"><span>留学</span></label>
+              <label class="gs-status-opt"><input type="checkbox" name="gs-status" value="休学"><span>休学</span></label>
+              <label class="gs-status-opt"><input type="checkbox" name="gs-status" value="院生"><span>院生</span></label>
+              <label class="gs-status-opt"><input type="checkbox" name="gs-status" value="既卒"><span>既卒</span></label>
+              <label class="gs-status-opt"><input type="checkbox" name="gs-status" value="社会人"><span>社会人</span></label>
+            </div>
+          </div>
+          <div><label class="gs-label" style="font-size:11px;">電話番号</label><input class="gs-input" id="gs-f-phone" type="tel" placeholder="090-1234-5678"></div>
+          <div><label class="gs-label" style="font-size:11px;">メールアドレス</label><input class="gs-input" id="gs-f-email" type="email" placeholder="taro@example.com"></div>
+        </div>
+        <p class="gs-mini" id="gs-basic-msg" style="margin-top:8px;"></p>
+        <button class="gs-btn gs-btn-primary" id="gs-basic-next-btn" style="margin-top:.6rem;">次へ（学生証の確認へ）</button>
+      </div>
+
+      <div class="gs-card" id="gs-upload-card" style="display:none;">
+        <label class="gs-label">学生証の写真</label>
+        <div class="gs-drop" id="gs-drop">
+          <input type="file" id="gs-file" accept="image/*" capture="environment" style="display:none;">
+          <p style="margin:0 0 10px; font-size:13px; color:var(--ink-soft);">学生証の文字がはっきり写るように撮影してください（有効期限の欄が写るとより正確です）</p>
+          <button class="gs-btn gs-btn-primary" id="gs-pick-btn">写真を選ぶ / 撮影する</button>
+        </div>
+        <div id="gs-preview-wrap" style="display:none; margin-top:1rem;">
+          <div class="gs-scanbox">
+            <img id="gs-preview-img" alt="学生証プレビュー">
+            <div class="gs-scanline" id="gs-scanline"></div>
+          </div>
+          <div class="gs-row" style="justify-content:center; margin-top:.8rem;">
+            <button class="gs-btn gs-btn-ghost" id="gs-retake-btn">撮り直す</button>
+            <button class="gs-btn gs-btn-primary" id="gs-scan-btn">この写真を読み取る</button>
+          </div>
+          <p class="gs-mini" id="gs-progress-label" style="text-align:center; margin-top:8px; display:none;"></p>
+          <div class="gs-progress" id="gs-progress-outer" style="display:none;"><div class="gs-progress-bar" id="gs-progress-bar"></div></div>
+        </div>
+      </div>
+
+      <div class="gs-card" id="gs-result-card" style="display:none;">
+        <div class="gs-row" style="justify-content:space-between;">
+          <label class="gs-label" style="margin:0;">判定結果</label>
+          <span id="gs-result-badge"></span>
+        </div>
+        <p class="gs-mini" id="gs-result-detail" style="margin:8px 0 10px;"></p>
+        <label class="gs-label">読み取った文字（確認用）</label>
+        <div class="gs-term" id="gs-ocr-term">-</div>
+        <div style="margin-top:1rem; display:flex; flex-direction:column; gap:8px;">
+          <label class="gs-check">
+            <input type="checkbox" id="gs-consent-terms">
+            <span><a href="https://drive.google.com/file/d/1sItiLGQocWy4Wbg5qmWoOQGLseTXAex6/view?usp=sharing" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">利用規約</a>に同意します</span>
+          </label>
+          <label class="gs-check">
+            <input type="checkbox" id="gs-consent-privacy">
+            <span><a href="https://drive.google.com/file/d/1lpGRWlrEYCivUbhjH66W3c-2b6kKWBHY/view?usp=sharing" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">個人情報の取り扱いについて</a>に同意し、入力情報および学生証確認結果を、弊社（グローパーソン合同会社）および提携するエージェントサービス・就活イベント運営者に提供することに同意します。</span>
+          </label>
+        </div>
+        <div class="gs-row" style="margin-top:1rem;">
+          <button class="gs-btn gs-btn-primary" id="gs-submit-btn">この内容で登録を送信する</button>
+        </div>
+        <p class="gs-mini" id="gs-submit-msg" style="margin-top:6px;"></p>
+      </div>
+
+      <div class="gs-card" id="gs-done-card" style="display:none; text-align:center;">
+        <p style="font-size:15px; font-weight:700; margin:0 0 6px;">プラットフォームへの登録情報を送信しました</p>
+        <p class="gs-mini" id="gs-done-detail"></p>
+        <button class="gs-btn gs-btn-ghost" id="gs-again-btn" style="margin-top:1rem;">別の学生を登録する</button>
+      </div>
+
+      <p class="gs-note">※ OCR（自動文字読取）は完璧ではありません。判定結果に関わらず、疑わしい場合は必ずスタッフが目視でも確認してください。「要確認」「不一致」となった場合は学生証を直接ご提示ください。</p>
+    </section>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+<script>
+(function(){
+  // ▼▼ デプロイ後に発行された「ウェブアプリのURL」をここに貼り付けてください ▼▼
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwOgldkkXBPi5i4KzhNS4WGtfepV-kd4lUK7UVW2D4d8AHxcG04iPkxq_b8TTW0FkLE/exec';
+  // ▲▲ 例: https://script.google.com/macros/s/XXXXXXXX/exec ▲▲
+
+  var q = function(id){ return document.getElementById(id); };
+  var state = { imgDataUrlHi: null, imgDataUrlLo: null, ocrText: '', bestGuess: null, allYears: [], status: null, basicInfo: null };
+
+  function setStep(n){ for(var i=1;i<=4;i++){ q('gs-s'+i).classList.toggle('on', i<=n); } }
+
+  // ---------- step 1 basic info ----------
+  q('gs-basic-next-btn').addEventListener('click', function(){
+    var name = q('gs-f-name').value.trim();
+    var dob = q('gs-f-dob').value;
+    var gradYear = parseInt(q('gs-f-gradyear').value, 10);
+    var statusChecked = Array.prototype.slice.call(document.querySelectorAll('#gs-f-status-group input:checked')).map(function(el){ return el.value; });
+    var status = statusChecked.join('・');
+    var phone = q('gs-f-phone').value.trim();
+    var email = q('gs-f-email').value.trim();
+    var msg = q('gs-basic-msg');
+    if(!name || !dob || !gradYear || !phone || !email){
+      msg.style.color = 'var(--danger)';
+      msg.textContent = '氏名・生年月日・卒業年度・電話番号・メールアドレスは必須です';
+      return;
+    }
+    if(!statusChecked.length){
+      msg.style.color = 'var(--danger)';
+      msg.textContent = 'ステータスを1つ以上選択してください';
+      return;
+    }
+    state.basicInfo = { name:name, dob:dob, gradYear:gradYear, status:status, phone:phone, email:email };
+    msg.style.color = 'var(--success)';
+    msg.textContent = '基本情報を確認しました。学生証を撮影してください。';
+    q('gs-upload-card').style.display = 'block';
+    setStep(2);
+  });
+
+  // ---------- file handling ----------
+  q('gs-pick-btn').addEventListener('click', function(){ q('gs-file').click(); });
+  q('gs-file').addEventListener('change', async function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var hi = await fileToDataUrl(file, 1100, 0.85);
+    var lo = await fileToDataUrl(file, 480, 0.55);
+    state.imgDataUrlHi = hi; state.imgDataUrlLo = lo;
+    q('gs-preview-img').src = hi;
+    q('gs-preview-wrap').style.display = 'block';
+    q('gs-result-card').style.display = 'none';
+    q('gs-done-card').style.display = 'none';
+  });
+  q('gs-retake-btn').addEventListener('click', function(){
+    q('gs-file').value = '';
+    q('gs-preview-wrap').style.display = 'none';
+    q('gs-result-card').style.display = 'none';
+  });
+
+  function fileToDataUrl(file, maxW, quality){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(){
+        var img = new Image();
+        img.onload = function(){
+          var scale = Math.min(1, maxW / img.width);
+          var w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = reader.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---------- OCR ----------
+  q('gs-scan-btn').addEventListener('click', async function(){
+    if(typeof Tesseract === 'undefined'){
+      alert('文字読み取り機能の読み込みに失敗しました。通信環境をご確認のうえ、再度お試しください。');
+      return;
+    }
+    var btn = this;
+    btn.disabled = true;
+    q('gs-scanline').classList.add('on');
+    q('gs-progress-outer').style.display = 'block';
+    q('gs-progress-label').style.display = 'block';
+    q('gs-progress-label').textContent = '準備中…';
+    q('gs-progress-bar').style.width = '0%';
+    try{
+      var result = await Tesseract.recognize(state.imgDataUrlHi, 'jpn+eng', {
+        logger: function(m){
+          if(m.status === 'recognizing text'){
+            var pct = Math.round((m.progress||0) * 100);
+            q('gs-progress-bar').style.width = pct + '%';
+            q('gs-progress-label').textContent = '解析中… ' + pct + '%';
+          } else if(m.status){
+            q('gs-progress-label').textContent = statusLabel(m.status);
+          }
+        }
+      });
+      state.ocrText = (result && result.data && result.data.text) ? result.data.text.trim() : '';
+      finishScan();
+    } catch(err){
+      console.error(err);
+      q('gs-progress-label').textContent = '読み取りに失敗しました。もう一度お試しください';
+    } finally {
+      q('gs-scanline').classList.remove('on');
+      btn.disabled = false;
+    }
+  });
+  function statusLabel(s){
+    var map = { 'loading tesseract core':'エンジンを読み込み中…', 'initializing tesseract':'初期化中…', 'loading language traineddata':'言語データを読み込み中…', 'initializing api':'準備中…' };
+    return map[s] || s;
+  }
+
+  function extractYears(text){
+    var lines = text.split(/\n/);
+    var priorityKeywords = ['有効','満了','迄','まで','卒業','期限'];
+    var priorityYear = null;
+    var allYears = [];
+    lines.forEach(function(line){
+      var matches = line.match(/20\d{2}/g);
+      if(matches){
+        matches.forEach(function(y){ if(allYears.indexOf(y) === -1) allYears.push(y); });
+        if(!priorityYear && priorityKeywords.some(function(k){ return line.indexOf(k) !== -1; })){
+          priorityYear = matches[matches.length-1];
+        }
+      }
+    });
+    var allYearsNum = allYears.map(Number).sort(function(a,b){ return a-b; });
+    var bestGuess = priorityYear ? Number(priorityYear) : (allYearsNum.length ? allYearsNum[allYearsNum.length-1] : null);
+    return { allYears: allYearsNum, bestGuess: bestGuess };
+  }
+
+  function finishScan(){
+    q('gs-progress-outer').style.display = 'none';
+    q('gs-progress-label').style.display = 'none';
+    var extraction = extractYears(state.ocrText);
+    state.allYears = extraction.allYears;
+    state.bestGuess = extraction.bestGuess;
+    var status;
+    if(state.bestGuess === null){ status = 'review'; }
+    else if(state.basicInfo && state.bestGuess === state.basicInfo.gradYear){ status = 'ok'; }
+    else { status = 'ng'; }
+    state.status = status;
+
+    q('gs-ocr-term').textContent = state.ocrText || '（文字を検出できませんでした）';
+    q('gs-result-badge').innerHTML = badgeHtml(status);
+    var detail;
+    if(status === 'ok'){ detail = '学生証から検出した年（' + state.bestGuess + '年）は、入力された卒業年度と一致しています。'; }
+    else if(status === 'ng'){ detail = '学生証から検出した年（' + state.bestGuess + '年）は、入力された卒業年度（' + state.basicInfo.gradYear + '年）と一致していません。学生証を直接ご確認ください。'; }
+    else { detail = '学生証から年を自動検出できませんでした。スタッフが学生証を直接ご確認ください。'; }
+    q('gs-result-detail').textContent = detail;
+    q('gs-result-card').style.display = 'block';
+    setStep(3);
+  }
+
+  function badgeHtml(status){
+    var map = { ok:['入力内容と一致','ok'], ng:['入力内容と不一致','ng'], review:['要確認','review'] };
+    var m = map[status] || ['-','review'];
+    return '<span class="gs-badge gs-badge-'+m[1]+'">'+m[0]+'</span>';
+  }
+
+  // ---------- submit ----------
+  q('gs-submit-btn').addEventListener('click', async function(){
+    var msg = q('gs-submit-msg');
+    if(!q('gs-consent-terms').checked || !q('gs-consent-privacy').checked){
+      msg.style.color = 'var(--danger)';
+      msg.textContent = '利用規約と個人情報の取り扱いの両方への同意が必要です';
+      return;
+    }
+    if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('PASTE_YOUR') === 0){
+      msg.style.color = 'var(--danger)';
+      msg.textContent = '送信先が設定されていません（管理者にお問い合わせください）';
+      return;
+    }
+    var btn = this;
+    btn.disabled = true;
+    msg.style.color = 'var(--ink-soft)';
+    msg.textContent = '送信中…';
+    var info = state.basicInfo;
+    var payload = {
+      name: info.name, dob: info.dob, gradYear: info.gradYear, status: info.status,
+      phone: info.phone, email: info.email,
+      verifyStatus: state.status, detectedYear: state.bestGuess,
+      photo: state.imgDataUrlLo
+    };
+    try{
+      // Content-Type を text/plain のままにすることで、Apps Script側の
+      // CORSプリフライト未対応による送信失敗を避けています。
+      var res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+      var json = await res.json();
+      if(json.result !== 'success'){ throw new Error(json.message || '送信エラー'); }
+    } catch(err){
+      console.error(err);
+      msg.style.color = 'var(--danger)';
+      msg.textContent = '送信に失敗しました。通信環境をご確認のうえ、もう一度お試しください。';
+      btn.disabled = false;
+      return;
+    }
+
+    q('gs-result-card').style.display = 'none';
+    q('gs-done-detail').innerHTML = badgeHtml(state.status) + '<br><br>スタッフの案内にしたがってお進みください。';
+    q('gs-done-card').style.display = 'block';
+    setStep(4);
+    btn.disabled = false;
+  });
+  q('gs-again-btn').addEventListener('click', function(){
+    state.imgDataUrlHi=null; state.imgDataUrlLo=null; state.ocrText=''; state.bestGuess=null; state.allYears=[]; state.status=null; state.basicInfo=null;
+    q('gs-f-name').value=''; q('gs-f-dob').value=''; q('gs-f-gradyear').value=''; q('gs-f-phone').value=''; q('gs-f-email').value='';
+    document.querySelectorAll('#gs-f-status-group input:checked').forEach(function(el){ el.checked = false; });
+    q('gs-consent-terms').checked = false;
+    q('gs-consent-privacy').checked = false;
+    q('gs-basic-msg').textContent = '';
+    q('gs-file').value = '';
+    q('gs-upload-card').style.display = 'none';
+    q('gs-preview-wrap').style.display = 'none';
+    q('gs-done-card').style.display = 'none';
+    setStep(1);
+  });
+})();
+</script>
