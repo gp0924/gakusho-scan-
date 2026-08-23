@@ -394,7 +394,7 @@
   function extractDob(text){
     var lines = text.split(/\n/);
     var dobKeywords = ['生年月日','生年'];
-    var datePattern = /(19|20)\d{2}\s*[\/\-年.]\s*(0?[1-9]|1[0-2])\s*[\/\-月.]\s*(0?[1-9]|[12]\d|3[01])/;
+    var datePattern = /(19|20)\d{2}\s*[\/\-年.]\s*(1[0-2]|0?[1-9])\s*[\/\-月.]\s*([12]\d|3[01]|0?[1-9])/;
     var candidateLine = lines.find(function(l){ return dobKeywords.some(function(k){ return l.indexOf(k) !== -1; }) && datePattern.test(l); });
     var m = candidateLine ? candidateLine.match(datePattern) : text.match(datePattern);
     if(!m) return { iso: null, foundKeyword: !!candidateLine };
