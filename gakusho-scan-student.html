@@ -79,7 +79,7 @@
     <section id="gs-view-student">
       <div class="gs-steps">
         <span class="gs-step on" id="gs-s1">① 基本情報を入力</span>
-        <span class="gs-step" id="gs-s2">② 学生証を撮影・選択</span>
+        <span class="gs-step" id="gs-s2">② 証明書類を撮影・選択</span>
         <span class="gs-step" id="gs-s3">③ 判定結果を確認</span>
         <span class="gs-step" id="gs-s4">④ 送信して登録完了</span>
       </div>
@@ -107,19 +107,24 @@
           <div><label class="gs-label" style="font-size:11px;">メールアドレス</label><input class="gs-input" id="gs-f-email" type="email" placeholder="taro@example.com"></div>
         </div>
         <p class="gs-mini" id="gs-basic-msg" style="margin-top:8px;"></p>
-        <button class="gs-btn gs-btn-primary" id="gs-basic-next-btn" style="margin-top:.6rem;">次へ（学生証の確認へ）</button>
+        <button class="gs-btn gs-btn-primary" id="gs-basic-next-btn" style="margin-top:.6rem;">次へ（証明書類の確認へ）</button>
       </div>
 
       <div class="gs-card" id="gs-upload-card" style="display:none;">
-        <label class="gs-label">学生証の写真</label>
+        <label class="gs-label">提出する証明書類の種類</label>
+        <div class="gs-status-group" id="gs-evidence-type-group" style="margin-bottom:1rem;">
+          <label class="gs-status-opt"><input type="radio" name="gs-evidence" value="id" checked><span>学生証の写真</span></label>
+          <label class="gs-status-opt"><input type="radio" name="gs-evidence" value="mypage"><span>大学マイページのスクリーンショット</span></label>
+        </div>
+        <label class="gs-label" id="gs-upload-label">学生証の写真</label>
         <div class="gs-drop" id="gs-drop">
           <input type="file" id="gs-file" accept="image/*" style="display:none;">
-          <p style="margin:0 0 10px; font-size:13px; color:var(--ink-soft);">学生証の文字がはっきり写るように撮影してください（有効期限の欄が写るとより正確です）</p>
+          <p style="margin:0 0 10px; font-size:13px; color:var(--ink-soft);" id="gs-upload-hint">学生証の文字がはっきり写るように撮影してください（有効期限の欄が写るとより正確です）</p>
           <button class="gs-btn gs-btn-primary" id="gs-pick-btn">写真を選ぶ / 撮影する</button>
         </div>
         <div id="gs-preview-wrap" style="display:none; margin-top:1rem;">
           <div class="gs-scanbox">
-            <img id="gs-preview-img" alt="学生証プレビュー">
+            <img id="gs-preview-img" alt="証明書類プレビュー">
             <div class="gs-scanline" id="gs-scanline"></div>
           </div>
           <div class="gs-row" style="justify-content:center; margin-top:.8rem;">
@@ -133,10 +138,15 @@
 
       <div class="gs-card" id="gs-result-card" style="display:none;">
         <div class="gs-row" style="justify-content:space-between;">
-          <label class="gs-label" style="margin:0;">判定結果</label>
+          <label class="gs-label" style="margin:0;">卒業年度の判定</label>
           <span id="gs-result-badge"></span>
         </div>
         <p class="gs-mini" id="gs-result-detail" style="margin:8px 0 10px;"></p>
+        <div class="gs-row" style="justify-content:space-between; margin-top:.6rem;">
+          <label class="gs-label" style="margin:0;">生年月日の判定</label>
+          <span id="gs-dob-badge"></span>
+        </div>
+        <p class="gs-mini" id="gs-dob-detail" style="margin:8px 0 10px;"></p>
         <label class="gs-label">読み取った文字（確認用）</label>
         <div class="gs-term" id="gs-ocr-term">-</div>
         <div style="margin-top:1rem; display:flex; flex-direction:column; gap:8px;">
@@ -146,7 +156,7 @@
           </label>
           <label class="gs-check">
             <input type="checkbox" id="gs-consent-privacy">
-            <span><a href="https://drive.google.com/file/d/1lpGRWlrEYCivUbhjH66W3c-2b6kKWBHY/view?usp=sharing" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">個人情報の取り扱いについて</a>に同意し、入力情報および学生証確認結果を、弊社（グローパーソン合同会社）および提携するエージェントサービス・就活イベント運営者に提供することに同意します。</span>
+            <span><a href="https://drive.google.com/file/d/1lpGRWlrEYCivUbhjH66W3c-2b6kKWBHY/view?usp=sharing" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">個人情報の取り扱いについて</a>に同意し、入力情報および提出書類の確認結果を、弊社（グローパーソン合同会社）および提携するエージェントサービス・就活イベント運営者に提供することに同意します。</span>
           </label>
         </div>
         <div class="gs-row" style="margin-top:1rem;">
@@ -161,7 +171,7 @@
         <button class="gs-btn gs-btn-ghost" id="gs-again-btn" style="margin-top:1rem;">別の学生を登録する</button>
       </div>
 
-      <p class="gs-note">※ OCR（自動文字読取）は完璧ではありません。判定結果に関わらず、疑わしい場合は必ずスタッフが目視でも確認してください。「要確認」「不一致」となった場合は学生証を直接ご提示ください。</p>
+      <p class="gs-note">※ OCR（自動文字読取）は完璧ではありません。判定結果に関わらず、疑わしい場合は必ずスタッフが目視でも確認してください。「要確認」「不一致」となった場合は書類を直接ご提示ください。</p>
     </section>
   </div>
 </div>
@@ -200,9 +210,22 @@
     }
     state.basicInfo = { name:name, dob:dob, gradYear:gradYear, status:status, phone:phone, email:email };
     msg.style.color = 'var(--success)';
-    msg.textContent = '基本情報を確認しました。学生証を撮影してください。';
+    msg.textContent = '基本情報を確認しました。証明書類を撮影・アップロードしてください。';
     q('gs-upload-card').style.display = 'block';
     setStep(2);
+  });
+
+  // ---------- evidence type toggle ----------
+  var evidenceHints = {
+    id: { label:'学生証の写真', hint:'学生証の文字がはっきり写るように撮影してください（有効期限の欄が写るとより正確です）' },
+    mypage: { label:'大学マイページのスクリーンショット', hint:'生年月日・卒業予定年度が表示されている画面をスクリーンショットしてアップロードしてください' }
+  };
+  document.querySelectorAll('#gs-evidence-type-group input[name="gs-evidence"]').forEach(function(radio){
+    radio.addEventListener('change', function(){
+      var info = evidenceHints[this.value];
+      q('gs-upload-label').textContent = info.label;
+      q('gs-upload-hint').textContent = info.hint;
+    });
   });
 
   // ---------- file handling ----------
@@ -285,9 +308,16 @@
     return map[s] || s;
   }
 
+  function getCurrentAcademicYear(){
+    var now = new Date();
+    var y = now.getFullYear();
+    var m = now.getMonth() + 1;
+    return (m >= 4) ? y : (y - 1);
+  }
+
   function extractYears(text){
     var lines = text.split(/\n/);
-    var priorityKeywords = ['有効','満了','迄','まで','卒業','期限'];
+    var priorityKeywords = ['有効','満了','迄','まで','卒業','期限','予定','在学','見込','終了'];
     var priorityYear = null;
     var allYears = [];
     lines.forEach(function(line){
@@ -300,8 +330,43 @@
       }
     });
     var allYearsNum = allYears.map(Number).sort(function(a,b){ return a-b; });
-    var bestGuess = priorityYear ? Number(priorityYear) : (allYearsNum.length ? allYearsNum[allYearsNum.length-1] : null);
-    return { allYears: allYearsNum, bestGuess: bestGuess };
+
+    // ① 直接「卒業予定」「在学」などの記載から見つかった年（最も信頼度が高い）
+    if(priorityYear){
+      return { allYears: allYearsNum, bestGuess: Number(priorityYear), method: 'direct' };
+    }
+
+    // ② 「入学」年度の記載から、標準4年制として卒業年度を逆算
+    var enrollLine = lines.find(function(l){ return l.indexOf('入学') !== -1 && /20\d{2}/.test(l); });
+    if(enrollLine){
+      var enrollYear = Number(enrollLine.match(/20\d{2}/)[0]);
+      return { allYears: allYearsNum, bestGuess: enrollYear + 4, method: 'estimated_enrollment' };
+    }
+
+    // ③ 「学年」（例：3年生）の記載から、現在の年度をもとに卒業年度を逆算
+    var gradeMatch = text.match(/([1-6])\s*年生/) || text.match(/学年[:：]?\s*([1-6])/);
+    if(gradeMatch){
+      var grade = Number(gradeMatch[1]);
+      var estimated = getCurrentAcademicYear() + (5 - grade);
+      return { allYears: allYearsNum, bestGuess: estimated, method: 'estimated_grade' };
+    }
+
+    // ④ どの手掛かりもない場合、書類内で見つかった最大の年を参考値として使う（信頼度は低い）
+    var fallback = allYearsNum.length ? allYearsNum[allYearsNum.length - 1] : null;
+    return { allYears: allYearsNum, bestGuess: fallback, method: fallback ? 'fallback_max' : null };
+  }
+
+  function extractDob(text){
+    var lines = text.split(/\n/);
+    var dobKeywords = ['生年月日','生年'];
+    var datePattern = /(19|20)\d{2}\s*[\/\-年.]\s*(0?[1-9]|1[0-2])\s*[\/\-月.]\s*(0?[1-9]|[12]\d|3[01])/;
+    var candidateLine = lines.find(function(l){ return dobKeywords.some(function(k){ return l.indexOf(k) !== -1; }) && datePattern.test(l); });
+    var m = candidateLine ? candidateLine.match(datePattern) : text.match(datePattern);
+    if(!m) return { iso: null, foundKeyword: !!candidateLine };
+    var yyyy = m[0].match(/(19|20)\d{2}/)[0];
+    var mm = ('0' + m[2]).slice(-2);
+    var dd = ('0' + m[3]).slice(-2);
+    return { iso: yyyy + '-' + mm + '-' + dd, foundKeyword: !!candidateLine };
   }
 
   function finishScan(){
@@ -310,19 +375,48 @@
     var extraction = extractYears(state.ocrText);
     state.allYears = extraction.allYears;
     state.bestGuess = extraction.bestGuess;
+    state.gradMethod = extraction.method;
     var status;
-    if(state.bestGuess === null){ status = 'review'; }
+    if(state.bestGuess === null || extraction.method === 'fallback_max'){
+      // 手掛かりが弱い推測値は「一致」と断定せず、必ずスタッフ確認に回す
+      status = 'review';
+    }
     else if(state.basicInfo && state.bestGuess === state.basicInfo.gradYear){ status = 'ok'; }
     else { status = 'ng'; }
     state.status = status;
 
+    var dobExtraction = extractDob(state.ocrText);
+    state.detectedDob = dobExtraction.iso;
+    var dobStatus;
+    if(!dobExtraction.iso){ dobStatus = 'review'; }
+    else if(state.basicInfo && dobExtraction.iso === state.basicInfo.dob){ dobStatus = 'ok'; }
+    else { dobStatus = 'ng'; }
+    state.dobStatus = dobStatus;
+
     q('gs-ocr-term').textContent = state.ocrText || '（文字を検出できませんでした）';
     q('gs-result-badge').innerHTML = badgeHtml(status);
+
+    var methodNote = {
+      direct: '',
+      estimated_enrollment: '（「入学」年度の表示から標準4年制として推定した値です）',
+      estimated_grade: '（「学年」の表示から推定した値です）',
+      fallback_max: '（直接の手掛かりが見つからず、書類内の年表記から参考値として推測したものです。必ず内容をご確認ください）'
+    }[extraction.method] || '';
+
     var detail;
-    if(status === 'ok'){ detail = '学生証から検出した年（' + state.bestGuess + '年）は、入力された卒業年度と一致しています。'; }
-    else if(status === 'ng'){ detail = '学生証から検出した年（' + state.bestGuess + '年）は、入力された卒業年度（' + state.basicInfo.gradYear + '年）と一致していません。学生証を直接ご確認ください。'; }
-    else { detail = '学生証から年を自動検出できませんでした。スタッフが学生証を直接ご確認ください。'; }
+    if(state.bestGuess === null){ detail = '卒業年度を自動検出できませんでした。スタッフが書類を直接ご確認ください。'; }
+    else if(status === 'ok'){ detail = '検出した年（' + state.bestGuess + '年）' + methodNote + 'は、入力された卒業年度と一致しています。'; }
+    else if(status === 'ng'){ detail = '検出した年（' + state.bestGuess + '年）' + methodNote + 'は、入力された卒業年度（' + state.basicInfo.gradYear + '年）と一致していません。書類を直接ご確認ください。'; }
+    else { detail = '検出した年（' + state.bestGuess + '年）' + methodNote + 'の信頼度が低いため、要確認としています。スタッフが書類を直接ご確認ください。'; }
     q('gs-result-detail').textContent = detail;
+
+    q('gs-dob-badge').innerHTML = badgeHtml(dobStatus);
+    var dobDetail;
+    if(dobStatus === 'ok'){ dobDetail = '検出した生年月日（' + state.detectedDob + '）は、入力内容と一致しています。'; }
+    else if(dobStatus === 'ng'){ dobDetail = '検出した生年月日（' + state.detectedDob + '）は、入力された生年月日（' + state.basicInfo.dob + '）と一致していません。書類を直接ご確認ください。'; }
+    else { dobDetail = '生年月日を自動検出できませんでした（書類に記載がない場合もあります）。スタッフが必要に応じて確認してください。'; }
+    q('gs-dob-detail').textContent = dobDetail;
+
     q('gs-result-card').style.display = 'block';
     setStep(3);
   }
@@ -351,10 +445,13 @@
     msg.style.color = 'var(--ink-soft)';
     msg.textContent = '送信中…';
     var info = state.basicInfo;
+    var evidenceType = document.querySelector('#gs-evidence-type-group input[name="gs-evidence"]:checked').value;
     var payload = {
       name: info.name, dob: info.dob, gradYear: info.gradYear, status: info.status,
       phone: info.phone, email: info.email,
-      verifyStatus: state.status, detectedYear: state.bestGuess,
+      verifyStatus: state.status, detectedYear: state.bestGuess, detectionMethod: state.gradMethod,
+      dobVerifyStatus: state.dobStatus, detectedDob: state.detectedDob,
+      evidenceType: evidenceType === 'mypage' ? '大学マイページ' : '学生証',
       photo: state.imgDataUrlLo
     };
     try{
@@ -378,9 +475,13 @@
     btn.disabled = false;
   });
   q('gs-again-btn').addEventListener('click', function(){
-    state.imgDataUrlHi=null; state.imgDataUrlLo=null; state.ocrText=''; state.bestGuess=null; state.allYears=[]; state.status=null; state.basicInfo=null;
+    state.imgDataUrlHi=null; state.imgDataUrlLo=null; state.ocrText=''; state.bestGuess=null; state.allYears=[]; state.status=null; state.basicInfo=null; state.detectedDob=null; state.dobStatus=null; state.gradMethod=null;
     q('gs-f-name').value=''; q('gs-f-dob').value=''; q('gs-f-gradyear').value=''; q('gs-f-phone').value=''; q('gs-f-email').value='';
     document.querySelectorAll('#gs-f-status-group input:checked').forEach(function(el){ el.checked = false; });
+    var idRadio = document.querySelector('#gs-evidence-type-group input[value="id"]');
+    idRadio.checked = true;
+    q('gs-upload-label').textContent = evidenceHints.id.label;
+    q('gs-upload-hint').textContent = evidenceHints.id.hint;
     q('gs-consent-terms').checked = false;
     q('gs-consent-privacy').checked = false;
     q('gs-basic-msg').textContent = '';
