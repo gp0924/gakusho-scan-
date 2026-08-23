@@ -90,6 +90,7 @@
           <div><label class="gs-label" style="font-size:11px;">氏名</label><input class="gs-input" id="gs-f-name" placeholder="山田 太郎"></div>
           <div><label class="gs-label" style="font-size:11px;">生年月日</label><input class="gs-input" id="gs-f-dob" type="date"></div>
           <div><label class="gs-label" style="font-size:11px;">卒業年度（西暦）</label><input class="gs-input" id="gs-f-gradyear" type="number" placeholder="2027" min="2000" max="2100"></div>
+          <div><label class="gs-label" style="font-size:11px;">紹介者ID</label><input class="gs-input" id="gs-f-referrer" placeholder="例：GPS1 / GPCA5 / 21"><p class="gs-mini" id="gs-referrer-note" style="margin-top:4px; display:none; color:var(--success);">✓ リンクから自動入力されました</p></div>
           <div style="grid-column:1 / -1;">
             <label class="gs-label" style="font-size:11px;">ステータス（該当するものすべてを選択）</label>
             <div class="gs-status-group" id="gs-f-status-group">
@@ -188,19 +189,35 @@
 
   function setStep(n){ for(var i=1;i<=4;i++){ q('gs-s'+i).classList.toggle('on', i<=n); } }
 
+  // ---------- 紹介者IDのURL自動入力 ----------
+  // 代理店ごとに配布するリンクの末尾に ?ref=GPS1 のようなパラメータを付けておくと、
+  // 学生が手入力しなくてもこの欄が自動で埋まり、入力ミスを防げます。
+  (function autofillReferrerFromUrl(){
+    var params = new URLSearchParams(window.location.search);
+    var ref = params.get('ref');
+    if(ref){
+      var input = q('gs-f-referrer');
+      input.value = ref;
+      input.readOnly = true;
+      input.style.background = 'var(--surface-alt)';
+      q('gs-referrer-note').style.display = 'block';
+    }
+  })();
+
   // ---------- step 1 basic info ----------
   q('gs-basic-next-btn').addEventListener('click', function(){
     var name = q('gs-f-name').value.trim();
     var dob = q('gs-f-dob').value;
     var gradYear = parseInt(q('gs-f-gradyear').value, 10);
+    var referrerId = q('gs-f-referrer').value.trim();
     var statusChecked = Array.prototype.slice.call(document.querySelectorAll('#gs-f-status-group input:checked')).map(function(el){ return el.value; });
     var status = statusChecked.join('・');
     var phone = q('gs-f-phone').value.trim();
     var email = q('gs-f-email').value.trim();
     var msg = q('gs-basic-msg');
-    if(!name || !dob || !gradYear || !phone || !email){
+    if(!name || !dob || !gradYear || !referrerId || !phone || !email){
       msg.style.color = 'var(--danger)';
-      msg.textContent = '氏名・生年月日・卒業年度・電話番号・メールアドレスは必須です';
+      msg.textContent = '氏名・生年月日・卒業年度・紹介者ID・電話番号・メールアドレスは必須です';
       return;
     }
     if(!statusChecked.length){
@@ -208,7 +225,7 @@
       msg.textContent = 'ステータスを1つ以上選択してください';
       return;
     }
-    state.basicInfo = { name:name, dob:dob, gradYear:gradYear, status:status, phone:phone, email:email };
+    state.basicInfo = { name:name, dob:dob, gradYear:gradYear, status:status, phone:phone, email:email, referrerId:referrerId };
     msg.style.color = 'var(--success)';
     msg.textContent = '基本情報を確認しました。証明書類を撮影・アップロードしてください。';
     q('gs-upload-card').style.display = 'block';
@@ -483,7 +500,7 @@
     var evidenceType = document.querySelector('#gs-evidence-type-group input[name="gs-evidence"]:checked').value;
     var payload = {
       name: info.name, dob: info.dob, gradYear: info.gradYear, status: info.status,
-      phone: info.phone, email: info.email,
+      phone: info.phone, email: info.email, referrerId: info.referrerId,
       verifyStatus: state.status, detectedYear: state.bestGuess, detectionMethod: state.gradMethod,
       dobVerifyStatus: state.dobStatus, detectedDob: state.detectedDob,
       evidenceType: evidenceType === 'mypage' ? '大学マイページ' : '学生証',
@@ -512,6 +529,7 @@
   q('gs-again-btn').addEventListener('click', function(){
     state.imgDataUrlHi=null; state.imgDataUrlLo=null; state.imgDataUrlOcr=null; state.ocrText=''; state.bestGuess=null; state.allYears=[]; state.status=null; state.basicInfo=null; state.detectedDob=null; state.dobStatus=null; state.gradMethod=null;
     q('gs-f-name').value=''; q('gs-f-dob').value=''; q('gs-f-gradyear').value=''; q('gs-f-phone').value=''; q('gs-f-email').value='';
+    if(!q('gs-f-referrer').readOnly){ q('gs-f-referrer').value=''; }
     document.querySelectorAll('#gs-f-status-group input:checked').forEach(function(el){ el.checked = false; });
     var idRadio = document.querySelector('#gs-evidence-type-group input[value="id"]');
     idRadio.checked = true;
