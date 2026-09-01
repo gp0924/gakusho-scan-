@@ -89,6 +89,13 @@
         <div class="gs-grid2">
           <div><label class="gs-label" style="font-size:11px;">氏名</label><input class="gs-input" id="gs-f-name" placeholder="山田 太郎"></div>
           <div><label class="gs-label" style="font-size:11px;">生年月日</label><input class="gs-input" id="gs-f-dob" type="date"></div>
+          <div>
+            <label class="gs-label" style="font-size:11px;">性別</label>
+            <div class="gs-status-group" id="gs-f-gender-group">
+              <label class="gs-status-opt"><input type="radio" name="gs-gender" value="男性"><span>男性</span></label>
+              <label class="gs-status-opt"><input type="radio" name="gs-gender" value="女性"><span>女性</span></label>
+            </div>
+          </div>
           <div><label class="gs-label" style="font-size:11px;">卒業年度（西暦）</label><input class="gs-input" id="gs-f-gradyear" type="number" placeholder="2027" min="2000" max="2100"></div>
           <div><label class="gs-label" style="font-size:11px;">紹介者ID</label><input class="gs-input" id="gs-f-referrer" placeholder="例：GPS1 / GPCA5 / 21"><p class="gs-mini" id="gs-referrer-note" style="margin-top:4px; display:none; color:var(--success);">✓ リンクから自動入力されました</p></div>
           <div style="grid-column:1 / -1;">
@@ -211,14 +218,16 @@
     var dob = q('gs-f-dob').value;
     var gradYear = parseInt(q('gs-f-gradyear').value, 10);
     var referrerId = q('gs-f-referrer').value.trim();
+    var genderEl = document.querySelector('#gs-f-gender-group input[name="gs-gender"]:checked');
+    var gender = genderEl ? genderEl.value : '';
     var statusChecked = Array.prototype.slice.call(document.querySelectorAll('#gs-f-status-group input:checked')).map(function(el){ return el.value; });
     var status = statusChecked.join('・');
     var phone = q('gs-f-phone').value.trim();
     var email = q('gs-f-email').value.trim();
     var msg = q('gs-basic-msg');
-    if(!name || !dob || !gradYear || !referrerId || !phone || !email){
+    if(!name || !dob || !gender || !gradYear || !referrerId || !phone || !email){
       msg.style.color = 'var(--danger)';
-      msg.textContent = '氏名・生年月日・卒業年度・紹介者ID・電話番号・メールアドレスは必須です';
+      msg.textContent = '氏名・生年月日・性別・卒業年度・紹介者ID・電話番号・メールアドレスは必須です';
       return;
     }
     if(!statusChecked.length){
@@ -226,7 +235,7 @@
       msg.textContent = 'ステータスを1つ以上選択してください';
       return;
     }
-    state.basicInfo = { name:name, dob:dob, gradYear:gradYear, status:status, phone:phone, email:email, referrerId:referrerId };
+    state.basicInfo = { name:name, dob:dob, gender:gender, gradYear:gradYear, status:status, phone:phone, email:email, referrerId:referrerId };
     msg.style.color = 'var(--success)';
     msg.textContent = '基本情報を確認しました。証明書類を撮影・アップロードしてください。';
     q('gs-upload-card').style.display = 'block';
@@ -500,7 +509,7 @@
     var info = state.basicInfo;
     var evidenceType = document.querySelector('#gs-evidence-type-group input[name="gs-evidence"]:checked').value;
     var payload = {
-      name: info.name, dob: info.dob, gradYear: info.gradYear, status: info.status,
+      name: info.name, dob: info.dob, gender: info.gender, gradYear: info.gradYear, status: info.status,
       phone: info.phone, email: info.email, referrerId: info.referrerId,
       verifyStatus: state.status, detectedYear: state.bestGuess, detectionMethod: state.gradMethod,
       dobVerifyStatus: state.dobStatus, detectedDob: state.detectedDob,
@@ -532,6 +541,7 @@
     q('gs-f-name').value=''; q('gs-f-dob').value=''; q('gs-f-gradyear').value=''; q('gs-f-phone').value=''; q('gs-f-email').value='';
     if(!q('gs-f-referrer').readOnly){ q('gs-f-referrer').value=''; }
     document.querySelectorAll('#gs-f-status-group input:checked').forEach(function(el){ el.checked = false; });
+    document.querySelectorAll('#gs-f-gender-group input:checked').forEach(function(el){ el.checked = false; });
     var idRadio = document.querySelector('#gs-evidence-type-group input[value="id"]');
     idRadio.checked = true;
     q('gs-upload-label').textContent = evidenceHints.id.label;
