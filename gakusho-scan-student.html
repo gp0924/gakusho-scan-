@@ -157,6 +157,12 @@
         <p class="gs-mini" id="gs-dob-detail" style="margin:8px 0 10px;"></p>
         <label class="gs-label">読み取った文字（確認用）</label>
         <div class="gs-term" id="gs-ocr-term">-</div>
+        <label class="gs-label" style="margin-top:1rem;">見ている業界</label>
+        <textarea class="gs-textarea" id="gs-f-industry" rows="2" placeholder="例：IT、金融、商社など"></textarea>
+        <label class="gs-label" style="margin-top:.8rem;">希望勤務地</label>
+        <textarea class="gs-textarea" id="gs-f-location" rows="2" placeholder="例：東京、地元希望など"></textarea>
+        <label class="gs-label" style="margin-top:.8rem;">就活で困っていることはありますか？</label>
+        <textarea class="gs-textarea" id="gs-f-concerns" rows="3" placeholder="自由にご記入ください"></textarea>
         <div style="margin-top:1rem; display:flex; flex-direction:column; gap:8px;">
           <label class="gs-check">
             <input type="checkbox" id="gs-consent-terms">
@@ -492,6 +498,14 @@
   // ---------- submit ----------
   q('gs-submit-btn').addEventListener('click', async function(){
     var msg = q('gs-submit-msg');
+    var industry = q('gs-f-industry').value.trim();
+    var location = q('gs-f-location').value.trim();
+    var concerns = q('gs-f-concerns').value.trim();
+    if(!industry || !location || !concerns){
+      msg.style.color = 'var(--danger)';
+      msg.textContent = '見ている業界・希望勤務地・就活で困っていることは必須です';
+      return;
+    }
     if(!q('gs-consent-terms').checked || !q('gs-consent-privacy').checked){
       msg.style.color = 'var(--danger)';
       msg.textContent = '利用規約と個人情報の取り扱いの両方への同意が必要です';
@@ -511,6 +525,7 @@
     var payload = {
       name: info.name, dob: info.dob, gender: info.gender, gradYear: info.gradYear, status: info.status,
       phone: info.phone, email: info.email, referrerId: info.referrerId,
+      industry: industry, location: location, concerns: concerns,
       verifyStatus: state.status, detectedYear: state.bestGuess, detectionMethod: state.gradMethod,
       dobVerifyStatus: state.dobStatus, detectedDob: state.detectedDob,
       evidenceType: evidenceType === 'mypage' ? '大学マイページ' : '学生証',
@@ -539,6 +554,7 @@
   q('gs-again-btn').addEventListener('click', function(){
     state.imgDataUrlHi=null; state.imgDataUrlLo=null; state.imgDataUrlOcr=null; state.ocrText=''; state.bestGuess=null; state.allYears=[]; state.status=null; state.basicInfo=null; state.detectedDob=null; state.dobStatus=null; state.gradMethod=null;
     q('gs-f-name').value=''; q('gs-f-dob').value=''; q('gs-f-gradyear').value=''; q('gs-f-phone').value=''; q('gs-f-email').value='';
+    q('gs-f-industry').value=''; q('gs-f-location').value=''; q('gs-f-concerns').value='';
     if(!q('gs-f-referrer').readOnly){ q('gs-f-referrer').value=''; }
     document.querySelectorAll('#gs-f-status-group input:checked').forEach(function(el){ el.checked = false; });
     document.querySelectorAll('#gs-f-gender-group input:checked').forEach(function(el){ el.checked = false; });
