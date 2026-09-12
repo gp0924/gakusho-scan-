@@ -44,6 +44,13 @@
 .gs-scanline{ position:absolute; left:0; right:0; height:3px; background:linear-gradient(90deg,transparent,var(--scan) 25%,var(--scan) 75%,transparent); box-shadow:0 0 12px 2px var(--scan); top:0; opacity:0; }
 .gs-scanline.on{ animation:gs-sweep 1.7s linear infinite; opacity:1; }
 @keyframes gs-sweep{ 0%{ top:0; } 100%{ top:100%; } }
+@keyframes gs-shutter-pulse{
+  0%{ box-shadow:0 2px 14px rgba(0,0,0,.4), 0 0 10px 2px rgba(255,255,255,.9), 0 0 18px 5px rgba(47,217,196,.75), 0 0 0 0 rgba(47,217,196,.55); }
+  70%{ box-shadow:0 2px 14px rgba(0,0,0,.4), 0 0 10px 2px rgba(255,255,255,.9), 0 0 18px 5px rgba(47,217,196,.75), 0 0 0 18px rgba(47,217,196,0); }
+  100%{ box-shadow:0 2px 14px rgba(0,0,0,.4), 0 0 10px 2px rgba(255,255,255,.9), 0 0 18px 5px rgba(47,217,196,.75), 0 0 0 0 rgba(47,217,196,0); }
+}
+#gs-camera-capture-btn{ animation:gs-shutter-pulse 1.8s ease-out infinite; }
+#gs-camera-capture-btn:active{ animation:none; transform:scale(.94); box-shadow:0 2px 14px rgba(0,0,0,.4), 0 0 10px 2px rgba(255,255,255,.9), 0 0 18px 5px rgba(47,217,196,.75); }
 .gs-term{ font-family:var(--f-mono); font-size:11.5px; line-height:1.55; background:#0D1017; color:#8FE8D8; border-radius:8px; padding:.85rem 1rem; max-height:160px; overflow-y:auto; white-space:pre-wrap; word-break:break-all; }
 .gs-badge{ display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; padding:5px 12px; border-radius:20px; white-space:nowrap; }
 .gs-badge-ok{ background:var(--success-bg); color:var(--success); }
@@ -154,7 +161,7 @@
           <div id="gs-camera-frame" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:84%; aspect-ratio:1.586; border:3px solid var(--scan); border-radius:10px; box-shadow:0 0 0 9999px rgba(0,0,0,.62); pointer-events:none;"></div>
         </div>
         <p style="color:#fff; font-size:13px; margin:16px 0 22px; text-align:center; max-width:400px;">書類をこの枠に合わせて、正面からまっすぐ撮影してください</p>
-        <button id="gs-camera-capture-btn" aria-label="この位置で撮影" style="width:76px; height:76px; border-radius:50%; background:#fff; border:5px solid var(--scan); box-shadow:0 2px 14px rgba(0,0,0,.4); padding:0; margin-bottom:calc(env(safe-area-inset-bottom, 0px) + 8px);"></button>
+        <button id="gs-camera-capture-btn" aria-label="この位置で撮影" style="width:88px; height:88px; border-radius:50%; background:#ffffff; border:4px solid var(--scan); padding:0; margin-bottom:calc(env(safe-area-inset-bottom, 0px) + 8px);"></button>
         <p style="color:#B7BCCB; font-size:11.5px; margin-top:8px;">タップして撮影</p>
       </div>
 
