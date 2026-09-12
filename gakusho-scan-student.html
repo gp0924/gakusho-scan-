@@ -128,7 +128,10 @@
         <div class="gs-drop" id="gs-drop">
           <input type="file" id="gs-file" accept="image/*" style="display:none;">
           <p style="margin:0 0 10px; font-size:13px; color:var(--ink-soft);" id="gs-upload-hint">書類をまっすぐ・平らにして、明るい場所で光の反射（グレア）が入らないように撮影してください（有効期限の欄が写るとより正確です）</p>
-          <button class="gs-btn gs-btn-primary" id="gs-pick-btn">写真を選ぶ / 撮影する</button>
+          <div class="gs-row" style="justify-content:center;">
+            <button class="gs-btn gs-btn-primary" id="gs-camera-btn">📷 ガイド枠で撮影する</button>
+            <button class="gs-btn gs-btn-ghost" id="gs-pick-btn">アルバムから選ぶ</button>
+          </div>
         </div>
         <div id="gs-preview-wrap" style="display:none; margin-top:1rem;">
           <div class="gs-scanbox">
@@ -141,6 +144,18 @@
           </div>
           <p class="gs-mini" id="gs-progress-label" style="text-align:center; margin-top:8px; display:none;"></p>
           <div class="gs-progress" id="gs-progress-outer" style="display:none;"><div class="gs-progress-bar" id="gs-progress-bar"></div></div>
+        </div>
+      </div>
+
+      <div id="gs-camera-modal" style="display:none; position:fixed; inset:0; background:#000; z-index:1000; flex-direction:column; align-items:center; justify-content:center; padding:1rem;">
+        <div style="position:relative; width:100%; max-width:480px;">
+          <video id="gs-camera-video" autoplay playsinline muted style="width:100%; display:block; border-radius:8px; background:#111;"></video>
+          <div id="gs-camera-frame" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:84%; aspect-ratio:1.586; border:3px solid var(--scan); border-radius:10px; box-shadow:0 0 0 9999px rgba(0,0,0,.62); pointer-events:none;"></div>
+        </div>
+        <p style="color:#fff; font-size:13px; margin:14px 0 4px; text-align:center; max-width:400px;">書類をこの枠に合わせて、正面からまっすぐ撮影してください</p>
+        <div class="gs-row" style="margin-top:10px;">
+          <button class="gs-btn gs-btn-primary" id="gs-camera-capture-btn">この位置で撮影</button>
+          <button class="gs-btn gs-btn-ghost" id="gs-camera-cancel-btn">キャンセル</button>
         </div>
       </div>
 
@@ -246,6 +261,7 @@
     msg.textContent = '基本情報を確認しました。証明書類を撮影・アップロードしてください。';
     q('gs-upload-card').style.display = 'block';
     setStep(2);
+    openCameraGuide_(); // 起動できなければ何も起きず、手動の「ガイド枠で撮影する」ボタンから開ける
   });
 
   // ---------- evidence type toggle ----------
@@ -266,75 +282,125 @@
   q('gs-file').addEventListener('change', async function(e){
     var file = e.target.files[0];
     if(!file) return;
-    var hi = await fileToDataUrl(file, 1100, 0.85);
-    var lo = await fileToDataUrl(file, 480, 0.55);
-    var ocrReady = await fileToOcrDataUrl(file, 1600);
-    state.imgDataUrlHi = hi; state.imgDataUrlLo = lo; state.imgDataUrlOcr = ocrReady;
-    q('gs-preview-img').src = hi;
-    q('gs-preview-wrap').style.display = 'block';
-    q('gs-result-card').style.display = 'none';
-    q('gs-done-card').style.display = 'none';
+    await handleImageSource(file);
   });
-  q('gs-retake-btn').addEventListener('click', function(){
+  q('gs-retake-btn').addEventListener('click', async function(){
     q('gs-file').value = '';
     q('gs-preview-wrap').style.display = 'none';
     q('gs-result-card').style.display = 'none';
+    await openCameraGuide_();
   });
 
-  function fileToDataUrl(file, maxW, quality){
+  // File または dataURL のどちらからでも画像を読み込めるようにする共通ヘルパー
+  function loadImage_(source){
     return new Promise(function(resolve, reject){
-      var reader = new FileReader();
-      reader.onload = function(){
+      if(typeof source === 'string'){
         var img = new Image();
-        img.onload = function(){
-          var scale = Math.min(1, maxW / img.width);
-          var w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-          var canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        };
+        img.onload = function(){ resolve(img); };
         img.onerror = reject;
-        img.src = reader.result;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+        img.src = source;
+      } else {
+        var reader = new FileReader();
+        reader.onload = function(){
+          var img2 = new Image();
+          img2.onload = function(){ resolve(img2); };
+          img2.onerror = reject;
+          img2.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(source);
+      }
+    });
+  }
+
+  function toScaledDataUrl(source, maxW, quality){
+    return loadImage_(source).then(function(img){
+      var scale = Math.min(1, maxW / img.width);
+      var w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      return canvas.toDataURL('image/jpeg', quality);
     });
   }
 
   // OCR専用：解像度を上げ、グレースケール化＋コントラスト強調することで、
   // カードの背景色や光の反射（グレア）による文字の読み取りにくさを軽減する
-  function fileToOcrDataUrl(file, maxW){
-    return new Promise(function(resolve, reject){
-      var reader = new FileReader();
-      reader.onload = function(){
-        var img = new Image();
-        img.onload = function(){
-          var scale = Math.min(1, maxW / img.width);
-          var w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-          var canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          var ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-          var imgData = ctx.getImageData(0, 0, w, h);
-          var d = imgData.data;
-          var contrast = 1.6;
-          for(var i = 0; i < d.length; i += 4){
-            var gray = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
-            var val = (gray - 128) * contrast + 128 + 12;
-            val = val < 0 ? 0 : (val > 255 ? 255 : val);
-            d[i] = d[i+1] = d[i+2] = val;
-          }
-          ctx.putImageData(imgData, 0, 0);
-          resolve(canvas.toDataURL('image/jpeg', 0.92));
-        };
-        img.onerror = reject;
-        img.src = reader.result;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+  function toOcrDataUrl(source, maxW){
+    return loadImage_(source).then(function(img){
+      var scale = Math.min(1, maxW / img.width);
+      var w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      var imgData = ctx.getImageData(0, 0, w, h);
+      var d = imgData.data;
+      var contrast = 1.6;
+      for(var i = 0; i < d.length; i += 4){
+        var gray = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+        var val = (gray - 128) * contrast + 128 + 12;
+        val = val < 0 ? 0 : (val > 255 ? 255 : val);
+        d[i] = d[i+1] = d[i+2] = val;
+      }
+      ctx.putImageData(imgData, 0, 0);
+      return canvas.toDataURL('image/jpeg', 0.92);
     });
   }
+
+  // File でも撮影したdataURLでも同じ処理を通す共通ルート
+  async function handleImageSource(source){
+    var hi = await toScaledDataUrl(source, 1100, 0.85);
+    var lo = await toScaledDataUrl(source, 480, 0.55);
+    var ocrReady = await toOcrDataUrl(source, 1600);
+    state.imgDataUrlHi = hi; state.imgDataUrlLo = lo; state.imgDataUrlOcr = ocrReady;
+    q('gs-preview-img').src = hi;
+    q('gs-preview-wrap').style.display = 'block';
+    q('gs-result-card').style.display = 'none';
+    q('gs-done-card').style.display = 'none';
+  }
+
+  // ---------- ガイド枠付きカメラ撮影 ----------
+  var cameraStream = null;
+  async function openCameraGuide_(){
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      // 自動起動時は、対応していない環境で無言でアラートを出すと煩わしいので
+      // ボタンからの手動起動時のみメッセージを出す（呼び出し元で判定）
+      return false;
+    }
+    try{
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      q('gs-camera-video').srcObject = cameraStream;
+      q('gs-camera-modal').style.display = 'flex';
+      return true;
+    } catch(err){
+      return false;
+    }
+  }
+  q('gs-camera-btn').addEventListener('click', async function(){
+    var ok = await openCameraGuide_();
+    if(!ok){
+      alert('カメラを起動できませんでした。カメラへのアクセスを許可するか、「アルバムから選ぶ」をお試しください。');
+    }
+  });
+  function closeCameraModal_(){
+    if(cameraStream){
+      cameraStream.getTracks().forEach(function(t){ t.stop(); });
+      cameraStream = null;
+    }
+    q('gs-camera-modal').style.display = 'none';
+  }
+  q('gs-camera-cancel-btn').addEventListener('click', closeCameraModal_);
+  q('gs-camera-capture-btn').addEventListener('click', async function(){
+    var video = q('gs-camera-video');
+    var canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+    closeCameraModal_();
+    await handleImageSource(dataUrl);
+  });
 
   // ---------- OCR ----------
   q('gs-scan-btn').addEventListener('click', async function(){
